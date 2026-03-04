@@ -5,11 +5,9 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/feed", label: "Feed" },
+  { href: "/dashboard", label: "Inicio" },
   { href: "/me/library", label: "Biblioteca" },
-  { href: "/me/reviews", label: "Mis reseñas" },
-  { href: "/me", label: "Perfil" },
+  { href: "/members", label: "Miembros" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
