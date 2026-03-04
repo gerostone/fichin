@@ -44,7 +44,9 @@ export function TopNav() {
         <div className="flex items-center gap-3">
           {session?.user ? (
             <>
-              <span className="hidden text-sm text-slate-300 sm:inline">@{session.user.username}</span>
+              <Link href="/me" className="hidden text-sm text-slate-300 hover:text-cyan-200 sm:inline">
+                @{session.user.username}
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="rounded-full border border-orange-300/70 px-3 py-2 text-xs font-semibold text-orange-200 hover:bg-orange-400/10"
