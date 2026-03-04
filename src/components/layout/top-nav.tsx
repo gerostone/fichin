@@ -6,8 +6,10 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/feed", label: "Feed" },
   { href: "/me/library", label: "Biblioteca" },
   { href: "/me/reviews", label: "Mis reseñas" },
+  { href: "/me", label: "Perfil" },
 ];
 
 function isActive(pathname: string, href: string): boolean {

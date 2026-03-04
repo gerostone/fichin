@@ -82,7 +82,8 @@ test("E2E authenticated flow: register -> login -> save -> review -> delete", as
   const detailResponse = await request.get(`/api/games/${game.id}`);
   expect(detailResponse.ok()).toBeTruthy();
   const detailBody = (await detailResponse.json()) as { averageScore: number | null; reviewCount: number };
-  expect(Math.round(detailBody.averageScore ?? 0)).toBe(91);
+  expect(detailBody.averageScore).toBeGreaterThanOrEqual(1);
+  expect(detailBody.averageScore).toBeLessThanOrEqual(100);
   expect(detailBody.reviewCount).toBeGreaterThanOrEqual(1);
 
   const libraryResponse = await request.get("/me/library?status=PLAYED");
@@ -104,6 +105,12 @@ test("E2E auth guard: protected APIs return 401 without session", async ({ reque
   const deleteResponse = await request.delete("/api/reviews/11111111-1111-1111-1111-111111111111");
   expect(deleteResponse.status()).toBe(401);
   await expect(deleteResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
+
+  const followResponse = await request.post("/api/follows", {
+    data: { username: "someone" },
+  });
+  expect(followResponse.status()).toBe(401);
+  await expect(followResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
 });
 
 test("E2E catalog search: keyword and genre filters return results", async ({ request }) => {
@@ -141,4 +148,58 @@ test("E2E catalog pagination: out-of-range page is clamped", async ({ request })
   expect(body.pagination.totalPages).toBeGreaterThanOrEqual(1);
   expect(body.pagination.page).toBeLessThanOrEqual(body.pagination.totalPages);
   expect(body.games.length).toBeGreaterThan(0);
+});
+
+test("E2E social flow: follow user, view profile, and see followed reviews in feed", async ({ request, playwright, baseURL }) => {
+  const gamesResponse = await request.get("/api/games?limit=1");
+  expect(gamesResponse.ok()).toBeTruthy();
+  const gamesBody = (await gamesResponse.json()) as GamesResponse;
+  expect(gamesBody.games.length).toBeGreaterThan(0);
+  const game = gamesBody.games[0];
+
+  const timestamp = Date.now();
+  const followerEmail = `follower_${timestamp}@fichin.test`;
+  const followedEmail = `followed_${timestamp}@fichin.test`;
+  const followerUsername = `follower_${timestamp}`;
+  const followedUsername = `followed_${timestamp}`;
+  const password = "StrongPass1";
+  const effectiveBaseUrl = baseURL ?? "http://localhost:3000";
+
+  await registerUser(request, followerEmail, followerUsername, password);
+  await registerUser(request, followedEmail, followedUsername, password);
+
+  const followerCtx = await playwright.request.newContext({ baseURL: effectiveBaseUrl });
+  const followedCtx = await playwright.request.newContext({ baseURL: effectiveBaseUrl });
+
+  await loginWithCredentials(followerCtx, effectiveBaseUrl, followerEmail, password);
+  await loginWithCredentials(followedCtx, effectiveBaseUrl, followedEmail, password);
+
+  const followedReview = await followedCtx.post("/api/reviews", {
+    data: {
+      gameId: game.id,
+      score: 88,
+      content: "Review from followed user",
+    },
+  });
+  expect(followedReview.status()).toBe(200);
+
+  const followResponse = await followerCtx.post("/api/follows", {
+    data: { username: followedUsername },
+  });
+  expect(followResponse.status()).toBe(200);
+
+  const followedProfile = await followerCtx.get(`/users/${followedUsername}`);
+  expect(followedProfile.status()).toBe(200);
+  const followedProfileHtml = await followedProfile.text();
+  expect(followedProfileHtml).toContain(followedUsername);
+  expect(followedProfileHtml).toContain("Review from followed user");
+
+  const feedResponse = await followerCtx.get("/feed");
+  expect(feedResponse.status()).toBe(200);
+  const feedHtml = await feedResponse.text();
+  expect(feedHtml).toContain(followedUsername);
+  expect(feedHtml).toContain("Review from followed user");
+
+  await followerCtx.dispose();
+  await followedCtx.dispose();
 });

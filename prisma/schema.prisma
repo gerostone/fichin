@@ -21,6 +21,8 @@ model User {
   updatedAt    DateTime   @updatedAt
   reviews      Review[]
   userGames    UserGame[]
+  following    UserFollow[] @relation("UserFollowing")
+  followers    UserFollow[] @relation("UserFollowers")
 
   @@index([email])
   @@index([username])
@@ -74,4 +76,17 @@ model Review {
   @@unique([userId, gameId])
   @@index([gameId])
   @@index([userId])
+}
+
+model UserFollow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
 }

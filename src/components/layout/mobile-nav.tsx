@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/dashboard", label: "Explorar" },
+  { href: "/feed", label: "Feed" },
   { href: "/me/library", label: "Biblioteca" },
-  { href: "/me/reviews", label: "Reseñas" },
+  { href: "/me", label: "Perfil" },
 ];
 
 export function MobileNav() {
@@ -14,7 +15,7 @@ export function MobileNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-slate-950/95 p-2 backdrop-blur md:hidden">
-      <ul className="grid grid-cols-3 gap-2">
+      <ul className="grid grid-cols-4 gap-2">
         {links.map((link) => {
           const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
 
