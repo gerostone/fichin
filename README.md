@@ -11,6 +11,9 @@ Producción: [https://fichin.vercel.app](https://fichin.vercel.app)
 - Dashboard con búsqueda, filtros y paginación.
 - Biblioteca personal con estados `WISHLIST` y `PLAYED`.
 - Reseñas editables con puntaje de `1` a `100`.
+- Perfiles públicos de usuario (`/users/[username]`).
+- Sistema de follow entre usuarios.
+- Feed social con reseñas de usuarios seguidos (`/feed`).
 - APIs protegidas y validadas con `zod`.
 - Suite de tests unitarios y E2E.
 
@@ -103,6 +106,7 @@ Implementado y verificado:
 - Unit tests: OK
 - E2E tests: OK
 - Build: OK
+- Social features: OK (`follow/profile/feed`)
 
 ## Notas
 

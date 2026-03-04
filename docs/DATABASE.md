@@ -18,6 +18,8 @@
 Relaciones:
 - `reviews` (1:N)
 - `userGames` (1:N)
+- `following` (1:N a `UserFollow` como follower)
+- `followers` (1:N a `UserFollow` como followed)
 
 ### `Game`
 
@@ -57,11 +59,23 @@ Restricción:
 Restricción:
 - `@@unique([userId, gameId])`
 
+### `UserFollow`
+
+- `id`: UUID (PK)
+- `followerId`: FK a `User`
+- `followingId`: FK a `User`
+- `createdAt`
+
+Restricción:
+- `@@unique([followerId, followingId])`
+- no se permite self-follow a nivel de lógica de aplicación
+
 ## Índices
 
 - `Game.title`, `Game.slug`
 - `Review.gameId`, `Review.userId`
 - `User.email`, `User.username`
+- `UserFollow.followerId`, `UserFollow.followingId`
 
 ## Seed
 

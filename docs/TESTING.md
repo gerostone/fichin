@@ -30,6 +30,9 @@ La suite valida:
 7. Biblioteca autenticada (`/me/library?status=PLAYED`).
 8. Borrado de reseña por autor.
 9. APIs protegidas retornan `401` sin sesión.
+10. Follow entre usuarios.
+11. Acceso a perfil público de otro usuario.
+12. Feed con reseñas de usuarios seguidos.
 
 Ejecutar:
 

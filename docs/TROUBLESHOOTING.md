@@ -8,6 +8,15 @@ Verificar:
 - sesión activa en `/api/auth/session`
 - `NEXTAUTH_SECRET` estable en `.env`
 
+## `401 Unauthorized` en `/api/follows` o redirect en `/feed`
+
+Causa: rutas sociales protegidas sin sesión válida.
+
+Verificar:
+- login activo
+- cookie de sesión vigente
+- `NEXTAUTH_URL` y `NEXTAUTH_SECRET` correctos en entorno actual
+
 ## `JWT_SESSION_ERROR decryption operation failed`
 
 Causa típica: cambió `NEXTAUTH_SECRET` y quedó cookie vieja.

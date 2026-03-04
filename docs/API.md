@@ -145,6 +145,51 @@ Responses:
 - `403` no autor
 - `404` no existe
 
+## Social Graph (Follow)
+
+### `GET /api/follows`
+
+Auth requerida.
+
+Devuelve la lista de usuarios que sigue el usuario actual.
+
+Responses:
+- `200`
+- `401` sin sesión
+
+### `POST /api/follows`
+
+Auth requerida.
+
+Request:
+
+```json
+{
+  "username": "otro_usuario"
+}
+```
+
+Reglas:
+- no se puede seguir a uno mismo
+- upsert por `(followerId, followingId)` para evitar duplicados
+
+Responses:
+- `200`
+- `400` payload inválido o self-follow
+- `401` sin sesión
+- `404` usuario objetivo no existe
+
+### `DELETE /api/follows/:username`
+
+Auth requerida.
+
+Elimina relación de follow si existe.
+
+Responses:
+- `200`
+- `401` sin sesión
+- `404` usuario objetivo no existe
+
 ## Errores comunes
 
 Formato general:

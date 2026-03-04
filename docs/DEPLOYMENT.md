@@ -46,6 +46,9 @@ npx vercel --prod --yes
 - Dashboard protegido
 - Guardado `WISHLIST`/`PLAYED`
 - Reseñas 1..100
+- Perfil propio (`/me`) y perfil público (`/users/[username]`)
+- Follow/unfollow funcional
+- Feed social (`/feed`) con reseñas de seguidos
 
 ## Redeploy manual
 
