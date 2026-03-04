@@ -9,6 +9,8 @@ type IgdbGame = {
   slug: string | null;
   summary: string | null;
   rating: number | null;
+  total_rating: number | null;
+  total_rating_count: number | null;
   first_release_date: number | null;
   genres: Array<{ name: string }> | null;
   platforms: Array<{ name: string }> | null;
@@ -103,40 +105,65 @@ async function fetchIgdbGames(): Promise<IgdbGame[]> {
   }
 
   const accessToken = await fetchTwitchAccessToken(clientId, clientSecret);
-  const offsets = [0, 100, 200];
-  const results: IgdbGame[] = [];
+  const byId = new Map<number, IgdbGame>();
 
-  for (const offset of offsets) {
-    const query = [
-      "fields id,name,slug,summary,rating,first_release_date,genres.name,platforms.name,cover.url;",
-      "where rating != null;",
-      "sort rating desc;",
-      "limit 100;",
-      `offset ${offset};`,
-    ].join(" ");
+  const queryProfiles = [
+    {
+      name: "high-rating",
+      where: "where rating != null;",
+      sort: "sort rating desc;",
+      pages: 8,
+    },
+    {
+      name: "high-total-rating",
+      where: "where total_rating != null & total_rating_count > 20;",
+      sort: "sort total_rating desc;",
+      pages: 8,
+    },
+    {
+      name: "newest-releases",
+      where: "where first_release_date != null;",
+      sort: "sort first_release_date desc;",
+      pages: 8,
+    },
+  ] as const;
 
-    const response = await fetch("https://api.igdb.com/v4/games", {
-      method: "POST",
-      headers: {
-        "Client-ID": clientId,
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-      body: query,
-    });
+  for (const profile of queryProfiles) {
+    for (let page = 0; page < profile.pages; page += 1) {
+      const offset = page * 100;
+      const query = [
+        "fields id,name,slug,summary,rating,total_rating,total_rating_count,first_release_date,genres.name,platforms.name,cover.url;",
+        profile.where,
+        profile.sort,
+        "limit 100;",
+        `offset ${offset};`,
+      ].join(" ");
 
-    if (!response.ok) {
-      throw new Error(`IGDB request failed at offset ${offset} (${response.status})`);
+      const response = await fetch("https://api.igdb.com/v4/games", {
+        method: "POST",
+        headers: {
+          "Client-ID": clientId,
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+        },
+        body: query,
+      });
+
+      if (!response.ok) {
+        throw new Error(`IGDB request failed for profile ${profile.name} at offset ${offset} (${response.status})`);
+      }
+
+      const data = (await response.json()) as IgdbGame[];
+      for (const game of data) {
+        byId.set(game.id, game);
+      }
+
+      // IGDB rate limit: max 4 requests/second.
+      await sleep(320);
     }
-
-    const data = (await response.json()) as IgdbGame[];
-    results.push(...data);
-
-    // IGDB rate limit: max 4 requests/second.
-    await sleep(300);
   }
 
-  return results;
+  return Array.from(byId.values());
 }
 
 async function main() {
@@ -160,7 +187,7 @@ async function main() {
           genres: game.genres?.map((genre) => genre.name) ?? [],
           platforms: game.platforms?.map((platform) => platform.name) ?? [],
           summary: game.summary,
-          ratingGlobal: game.rating ? Math.round(game.rating) : null,
+          ratingGlobal: game.total_rating ? Math.round(game.total_rating) : game.rating ? Math.round(game.rating) : null,
         }))
     );
 

@@ -68,7 +68,11 @@ Restricción:
 Archivo: `prisma/seed.ts`
 
 Estrategia:
-1. Si existen `IGDB_CLIENT_ID` y `IGDB_CLIENT_SECRET`, obtiene token OAuth2 de Twitch e importa juegos populares desde IGDB.
+1. Si existen `IGDB_CLIENT_ID` y `IGDB_CLIENT_SECRET`, obtiene token OAuth2 de Twitch e importa juegos desde IGDB combinando perfiles:
+   - alto `rating`
+   - alto `total_rating` con mínimo de votos (`total_rating_count`)
+   - lanzamientos recientes por `first_release_date`
+   Luego deduplica por `id` de IGDB.
 2. Si no existe o falla, usa fallback local `prisma/data/famous-games.json`.
 
 Comando:
