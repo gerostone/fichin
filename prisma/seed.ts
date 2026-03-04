@@ -163,6 +163,51 @@ async function fetchIgdbGames(): Promise<IgdbGame[]> {
     }
   }
 
+  // Add explicit franchise coverage for popular keywords that can be underrepresented
+  // in pure top-rating/recent slices.
+  const curatedSearchTerms = [
+    "EA SPORTS FC",
+    "FIFA",
+    "eFootball",
+    "PES",
+    "Football Manager",
+    "NBA 2K",
+    "Madden NFL",
+    "F1",
+    "WWE 2K",
+    "MLB The Show",
+    "NHL",
+  ];
+
+  for (const term of curatedSearchTerms) {
+    const query = [
+      `search "${term}";`,
+      "fields id,name,slug,summary,rating,total_rating,total_rating_count,first_release_date,genres.name,platforms.name,cover.url;",
+      "limit 50;",
+    ].join(" ");
+
+    const response = await fetch("https://api.igdb.com/v4/games", {
+      method: "POST",
+      headers: {
+        "Client-ID": clientId,
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+      body: query,
+    });
+
+    if (!response.ok) {
+      throw new Error(`IGDB search request failed for term "${term}" (${response.status})`);
+    }
+
+    const data = (await response.json()) as IgdbGame[];
+    for (const game of data) {
+      byId.set(game.id, game);
+    }
+
+    await sleep(320);
+  }
+
   return Array.from(byId.values());
 }
 
