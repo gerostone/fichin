@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fichin
 
-## Getting Started
+Web app responsive para buscar, guardar y reseñar videojuegos.
 
-First, run the development server:
+## Qué incluye
+
+- Catálogo de videojuegos (seed local + opción de importar desde IGDB).
+- Registro e inicio de sesión con email/contraseña.
+- Dashboard con búsqueda, filtros y paginación.
+- Biblioteca personal con estados `WISHLIST` y `PLAYED`.
+- Reseñas editables con puntaje de `1` a `100`.
+- APIs protegidas y validadas con `zod`.
+- Suite de tests unitarios y E2E.
+
+## Stack
+
+- `Next.js 16` (App Router)
+- `TypeScript`
+- `Prisma` + `PostgreSQL`
+- `NextAuth` (credentials + JWT session)
+- `Tailwind CSS`
+- `Vitest` + `Playwright`
+
+## Estructura principal
+
+- `src/app`: páginas App Router y route handlers (`/api/*`)
+- `src/components`: componentes de layout/UI/formularios
+- `src/lib`: auth, prisma, validaciones, sanitización, rate limiting
+- `prisma`: schema, seed y dataset fallback
+- `tests/e2e`: flujos end-to-end
+- `docs`: documentación técnica detallada
+
+## Quick Start
+
+### 1) Instalar dependencias
+
+```bash
+npm install
+```
+
+### 2) Configurar variables de entorno
+
+Copiar `.env.example` a `.env` y ajustar valores.
+
+```env
+DATABASE_URL="postgresql://<usuario>@localhost:5432/fichin"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="<secret-largo-aleatorio>"
+IGDB_CLIENT_ID=""
+IGDB_CLIENT_SECRET=""
+```
+
+### 3) Crear base y sincronizar schema
+
+```bash
+createdb -h localhost fichin
+npm run db:push
+```
+
+### 4) Seed del catálogo
+
+```bash
+npm run db:seed
+```
+
+### 5) Levantar app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev`: servidor de desarrollo
+- `npm run build`: build de producción
+- `npm run start`: servir build de producción
+- `npm run lint`: lint
+- `npm run test`: tests unitarios (Vitest)
+- `npm run test:e2e`: tests E2E (Playwright)
+- `npm run db:generate`: genera Prisma Client
+- `npm run db:push`: sincroniza schema con DB
+- `npm run db:migrate`: migraciones de desarrollo
+- `npm run db:seed`: carga catálogo inicial
 
-## Learn More
+## Documentación técnica
 
-To learn more about Next.js, take a look at the following resources:
+- [Arquitectura](docs/ARCHITECTURE.md)
+- [Modelo de datos](docs/DATABASE.md)
+- [API REST](docs/API.md)
+- [Testing](docs/TESTING.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estado actual
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Implementado y verificado:
 
-## Deploy on Vercel
+- Lint: OK
+- Unit tests: OK
+- E2E tests: OK
+- Build: OK
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notas
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `prisma.seed` en `package.json` funciona actualmente, pero Prisma indica deprecación hacia `prisma.config.ts` en versiones futuras.
+- Sin `IGDB_CLIENT_ID` y `IGDB_CLIENT_SECRET`, el seed usa `prisma/data/famous-games.json`.

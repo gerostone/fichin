@@ -1,0 +1,57 @@
+[
+  {
+    "externalId": "fallback-1",
+    "title": "The Legend of Zelda: Breath of the Wild",
+    "slug": "the-legend-of-zelda-breath-of-the-wild",
+    "coverUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg",
+    "releaseDate": "2017-03-03",
+    "genres": ["Adventure", "Action"],
+    "platforms": ["Nintendo Switch", "Wii U"],
+    "summary": "An open-world adventure where exploration, physics systems, and player freedom define the experience.",
+    "ratingGlobal": 97
+  },
+  {
+    "externalId": "fallback-2",
+    "title": "The Witcher 3: Wild Hunt",
+    "slug": "the-witcher-3-wild-hunt",
+    "coverUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg",
+    "releaseDate": "2015-05-19",
+    "genres": ["RPG", "Adventure"],
+    "platforms": ["PC", "PlayStation 5", "Xbox Series X"],
+    "summary": "A story-driven RPG where choices, world-building, and quest design are central.",
+    "ratingGlobal": 94
+  },
+  {
+    "externalId": "fallback-3",
+    "title": "Elden Ring",
+    "slug": "elden-ring",
+    "coverUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
+    "releaseDate": "2022-02-25",
+    "genres": ["RPG", "Action"],
+    "platforms": ["PC", "PlayStation 5", "Xbox Series X"],
+    "summary": "A large-scale action RPG blending open-world exploration with demanding combat.",
+    "ratingGlobal": 96
+  },
+  {
+    "externalId": "fallback-4",
+    "title": "Grand Theft Auto V",
+    "slug": "grand-theft-auto-v",
+    "coverUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lbd.jpg",
+    "releaseDate": "2013-09-17",
+    "genres": ["Action", "Open World"],
+    "platforms": ["PC", "PlayStation 5", "Xbox Series X"],
+    "summary": "An open-world action game with a multi-character narrative and online mode.",
+    "ratingGlobal": 92
+  },
+  {
+    "externalId": "fallback-5",
+    "title": "Red Dead Redemption 2",
+    "slug": "red-dead-redemption-2",
+    "coverUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg",
+    "releaseDate": "2018-10-26",
+    "genres": ["Adventure", "Action"],
+    "platforms": ["PC", "PlayStation 5", "Xbox Series X"],
+    "summary": "A cinematic western with deep world simulation and character-focused storytelling.",
+    "ratingGlobal": 96
+  }
+]
