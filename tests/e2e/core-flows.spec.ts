@@ -111,6 +111,12 @@ test("E2E auth guard: protected APIs return 401 without session", async ({ reque
   });
   expect(followResponse.status()).toBe(401);
   await expect(followResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
+
+  const avatarResponse = await request.patch("/api/me/avatar", {
+    data: { avatarUrl: "https://example.com/avatar.png" },
+  });
+  expect(avatarResponse.status()).toBe(401);
+  await expect(avatarResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
 });
 
 test("E2E catalog search: keyword and genre filters return results", async ({ request }) => {

@@ -44,3 +44,7 @@ export const followSchema = z.object({
     .max(24)
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers and underscores."),
 });
+
+export const avatarUpdateSchema = z.object({
+  avatarUrl: z.union([z.url().max(500), z.null()]),
+});

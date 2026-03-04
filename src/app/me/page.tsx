@@ -3,19 +3,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserGameStatus } from "@prisma/client";
 
+import { ProfileAvatarEditor } from "@/components/social/profile-avatar-editor";
+import { buildAvatarSeed, getInitials } from "@/lib/avatar";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-function buildAvatarSeed(username: string): string {
-  const colors = ["#0ea5e9", "#22d3ee", "#fb923c", "#38bdf8", "#14b8a6"];
-  let hash = 0;
-
-  for (let i = 0; i < username.length; i += 1) {
-    hash = username.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  return colors[Math.abs(hash) % colors.length];
-}
 
 function formatMonthDay(date: Date): string {
   const month = date.toLocaleString("es-AR", { month: "short" }).toUpperCase();
@@ -110,19 +101,14 @@ export default async function MyProfilePage() {
   ]);
 
   const avatarColor = buildAvatarSeed(user.username);
-  const initials = user.username.slice(0, 2).toUpperCase();
+  const initials = getInitials(user.username);
 
   return (
     <div className="space-y-7">
       <section className="rounded-3xl border border-white/10 bg-slate-900/60 p-5 md:p-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
           <div className="flex items-start gap-4">
-            <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-white/20 text-2xl font-bold text-slate-950"
-              style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
-            >
-              {initials}
-            </div>
+            <ProfileAvatarEditor username={user.username} avatarUrl={user.avatarUrl} avatarColor={avatarColor} initials={initials} />
 
             <div>
               <div className="flex flex-wrap items-center gap-2">

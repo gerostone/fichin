@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { buildAvatarSeed, getInitials } from "@/lib/avatar";
 import { prisma } from "@/lib/prisma";
 
 type MembersPageProps = {
@@ -16,17 +17,6 @@ function formatCount(value: number, unit: string): string {
   }
 
   return `${value} ${unit}`;
-}
-
-function buildAvatarSeed(username: string): string {
-  const colors = ["#0ea5e9", "#22d3ee", "#fb923c", "#38bdf8", "#14b8a6"];
-  let hash = 0;
-
-  for (let i = 0; i < username.length; i += 1) {
-    hash = username.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  return colors[Math.abs(hash) % colors.length];
 }
 
 export default async function MembersPage({ searchParams }: MembersPageProps) {
@@ -142,17 +132,24 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {featuredMembers.map((member) => {
               const avatarColor = buildAvatarSeed(member.username);
-              const initials = member.username.slice(0, 2).toUpperCase();
+              const initials = getInitials(member.username);
 
               return (
                 <article key={member.id} className="space-y-3">
                   <Link href={`/users/${member.username}`} className="group block">
-                    <div
-                      className="relative mx-auto flex h-40 w-40 items-center justify-center rounded-full border border-white/20 text-4xl font-bold text-slate-950 transition group-hover:scale-[1.03]"
-                      style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
-                    >
-                      {initials}
-                    </div>
+                    {member.avatarUrl ? (
+                      <div
+                        className="relative mx-auto h-40 w-40 rounded-full border border-white/20 bg-cover bg-center transition group-hover:scale-[1.03]"
+                        style={{ backgroundImage: `url(${member.avatarUrl})` }}
+                      />
+                    ) : (
+                      <div
+                        className="relative mx-auto flex h-40 w-40 items-center justify-center rounded-full border border-white/20 text-4xl font-bold text-slate-950 transition group-hover:scale-[1.03]"
+                        style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
+                      >
+                        {initials}
+                      </div>
+                    )}
                   </Link>
 
                   <div className="text-center">
@@ -200,7 +197,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {popularMembers.map((member) => {
               const avatarColor = buildAvatarSeed(member.username);
-              const initials = member.username.slice(0, 2).toUpperCase();
+              const initials = getInitials(member.username);
 
               return (
                 <Link
@@ -208,12 +205,19 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
                   href={`/users/${member.username}`}
                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/60 p-3 hover:border-cyan-300/50"
                 >
-                  <div
-                    className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-slate-950"
-                    style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
-                  >
-                    {initials}
-                  </div>
+                  {member.avatarUrl ? (
+                    <div
+                      className="h-12 w-12 rounded-full bg-cover bg-center"
+                      style={{ backgroundImage: `url(${member.avatarUrl})` }}
+                    />
+                  ) : (
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-slate-950"
+                      style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
+                    >
+                      {initials}
+                    </div>
+                  )}
                   <div>
                     <p className="font-semibold text-slate-100">{member.username}</p>
                     <p className="text-xs text-slate-300">

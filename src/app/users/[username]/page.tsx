@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { FollowButton } from "@/components/social/follow-button";
+import { ProfileAvatarEditor } from "@/components/social/profile-avatar-editor";
+import { buildAvatarSeed, getInitials } from "@/lib/avatar";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -61,13 +63,40 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
         })) !== null
       : false;
 
+  const avatarColor = buildAvatarSeed(user.username);
+  const initials = getInitials(user.username);
+
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold">@{user.username}</h1>
-            <p className="mt-2 text-sm text-slate-300">Perfil público de reseñas de videojuegos.</p>
+          <div className="flex items-start gap-4">
+            {isOwnProfile ? (
+              <ProfileAvatarEditor username={user.username} avatarUrl={user.avatarUrl} avatarColor={avatarColor} initials={initials} />
+            ) : (
+              <div className="h-24 w-24 rounded-full border border-white/20">
+                {user.avatarUrl ? (
+                  <div
+                    className="h-full w-full rounded-full bg-cover bg-center"
+                    style={{ backgroundImage: `url(${user.avatarUrl})` }}
+                    aria-hidden
+                  />
+                ) : (
+                  <div
+                    className="flex h-full w-full items-center justify-center rounded-full text-2xl font-bold text-slate-950"
+                    style={{ background: `radial-gradient(circle at 20% 20%, #ffffff, ${avatarColor})` }}
+                    aria-hidden
+                  >
+                    {initials}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div>
+              <h1 className="text-3xl font-bold">@{user.username}</h1>
+              <p className="mt-2 text-sm text-slate-300">Perfil público de reseñas de videojuegos.</p>
+            </div>
           </div>
 
           {!isOwnProfile && session?.user ? (
