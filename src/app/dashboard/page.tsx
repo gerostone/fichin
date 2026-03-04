@@ -17,7 +17,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const q = params.q?.trim() ?? "";
   const genre = params.genre?.trim() ?? "";
   const platform = params.platform?.trim() ?? "";
-  const page = Math.max(Number(params.page ?? "1") || 1, 1);
+  const requestedPage = Math.max(Number(params.page ?? "1") || 1, 1);
   const limit = 12;
 
   const where = {
@@ -33,28 +33,32 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ...(platform ? { platforms: { has: platform } } : {}),
   };
 
-  const [games, total, facets] = await Promise.all([
-    prisma.game.findMany({
-      where,
-      orderBy: [{ ratingGlobal: "desc" }, { title: "asc" }],
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        coverUrl: true,
-        genres: true,
-        platforms: true,
-        ratingGlobal: true,
-      },
-    }),
+  const [total, facets] = await Promise.all([
     prisma.game.count({ where }),
     prisma.game.findMany({
       take: 200,
       select: { genres: true, platforms: true },
     }),
   ]);
+
+  const totalPages = Math.max(Math.ceil(total / limit), 1);
+  const page = Math.min(requestedPage, totalPages);
+
+  const games = await prisma.game.findMany({
+    where,
+    orderBy: [{ ratingGlobal: "desc" }, { title: "asc" }],
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      coverUrl: true,
+      genres: true,
+      platforms: true,
+      ratingGlobal: true,
+    },
+  });
 
   const gameIds = games.map((game) => game.id);
   const grouped =
@@ -72,13 +76,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const genreOptions = Array.from(new Set(facets.flatMap((entry) => entry.genres))).sort();
   const platformOptions = Array.from(new Set(facets.flatMap((entry) => entry.platforms))).sort();
 
-  const totalPages = Math.max(Math.ceil(total / limit), 1);
-
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 md:p-6">
         <h1 className="text-2xl font-bold md:text-3xl">Explorar videojuegos</h1>
-        <form className="mt-4 grid gap-3 md:grid-cols-4">
+        <form action="/dashboard" className="mt-4 grid gap-3 md:grid-cols-4">
           <input
             type="text"
             name="q"

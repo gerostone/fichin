@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid query parameters" }, { status: 400 });
   }
 
-  const { q, genre, platform, sort, page, limit } = parsed.data;
+  const { q, genre, platform, sort, page: requestedPage, limit } = parsed.data;
 
   const where = {
     ...(q
@@ -41,28 +41,29 @@ export async function GET(request: NextRequest) {
         ? [{ releaseDate: "desc" as const }, { title: "asc" as const }]
         : [{ ratingGlobal: "desc" as const }, { title: "asc" as const }];
 
-  const [total, games] = await Promise.all([
-    prisma.game.count({ where }),
-    prisma.game.findMany({
-      where,
-      orderBy,
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        coverUrl: true,
-        genres: true,
-        platforms: true,
-        releaseDate: true,
-        ratingGlobal: true,
-        _count: {
-          select: { reviews: true },
-        },
+  const total = await prisma.game.count({ where });
+  const totalPages = Math.max(Math.ceil(total / limit), 1);
+  const page = Math.min(requestedPage, totalPages);
+
+  const games = await prisma.game.findMany({
+    where,
+    orderBy,
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      coverUrl: true,
+      genres: true,
+      platforms: true,
+      releaseDate: true,
+      ratingGlobal: true,
+      _count: {
+        select: { reviews: true },
       },
-    }),
-  ]);
+    },
+  });
 
   const scoreMap = new Map<string, number | null>();
   if (games.length > 0) {
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
     },
   });
 }

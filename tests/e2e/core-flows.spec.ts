@@ -105,3 +105,40 @@ test("E2E auth guard: protected APIs return 401 without session", async ({ reque
   expect(deleteResponse.status()).toBe(401);
   await expect(deleteResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
 });
+
+test("E2E catalog search: keyword and genre filters return results", async ({ request }) => {
+  const keywordResponse = await request.get("/api/games?limit=20&q=arches");
+  expect(keywordResponse.ok()).toBeTruthy();
+  const keywordBody = (await keywordResponse.json()) as {
+    games: Array<{ title: string }>;
+    pagination: { total: number };
+  };
+
+  expect(keywordBody.pagination.total).toBeGreaterThan(0);
+  expect(keywordBody.games.some((game) => game.title.toLowerCase().includes("arches"))).toBeTruthy();
+
+  const genreResponse = await request.get("/api/games?limit=20&genre=Indie");
+  expect(genreResponse.ok()).toBeTruthy();
+  const genreBody = (await genreResponse.json()) as {
+    games: Array<{ genres: string[] }>;
+    pagination: { total: number };
+  };
+
+  expect(genreBody.pagination.total).toBeGreaterThan(0);
+  expect(genreBody.games.every((game) => game.genres.includes("Indie"))).toBeTruthy();
+});
+
+test("E2E catalog pagination: out-of-range page is clamped", async ({ request }) => {
+  const response = await request.get("/api/games?limit=12&q=arches&page=999");
+  expect(response.ok()).toBeTruthy();
+
+  const body = (await response.json()) as {
+    games: Array<{ title: string }>;
+    pagination: { page: number; total: number; totalPages: number };
+  };
+
+  expect(body.pagination.total).toBeGreaterThan(0);
+  expect(body.pagination.totalPages).toBeGreaterThanOrEqual(1);
+  expect(body.pagination.page).toBeLessThanOrEqual(body.pagination.totalPages);
+  expect(body.games.length).toBeGreaterThan(0);
+});
