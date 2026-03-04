@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { TopNav } from "@/components/layout/top-nav";
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </main>
           <MobileNav />
         </AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );
