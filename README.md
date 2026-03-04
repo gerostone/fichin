@@ -2,6 +2,8 @@
 
 Web app responsive para buscar, guardar y reseñar videojuegos.
 
+Producción: [https://fichin.vercel.app](https://fichin.vercel.app)
+
 ## Qué incluye
 
 - Catálogo de videojuegos (seed local + opción de importar desde IGDB).
@@ -90,6 +92,7 @@ Abrir [http://localhost:3000](http://localhost:3000).
 - [Modelo de datos](docs/DATABASE.md)
 - [API REST](docs/API.md)
 - [Testing](docs/TESTING.md)
+- [Deployment](docs/DEPLOYMENT.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## Estado actual
