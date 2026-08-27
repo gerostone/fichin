@@ -15,6 +15,7 @@ Configurar en Vercel:
 - `NEXTAUTH_SECRET`: secret largo y aleatorio
 - `IGDB_CLIENT_ID`: credencial Twitch/IGDB
 - `IGDB_CLIENT_SECRET`: credencial Twitch/IGDB
+- `BLOB_READ_WRITE_TOKEN`: token de Vercel Blob para upload de avatares
 
 ## Flujo recomendado de primer deploy
 
@@ -49,6 +50,8 @@ npx vercel --prod --yes
 - Perfil propio (`/me`) y perfil público (`/users/[username]`)
 - Follow/unfollow funcional
 - Feed social (`/feed`) con reseñas de seguidos
+- Upload de avatar desde dispositivo en perfil propio (`/me`)
+- PWA instalable (`manifest.webmanifest`, service worker, iconos app)
 
 ## Redeploy manual
 

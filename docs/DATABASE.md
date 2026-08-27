@@ -13,6 +13,7 @@
 - `email`: único
 - `username`: único
 - `passwordHash`: string
+- `avatarUrl`: string opcional (URL pública del avatar)
 - `createdAt`, `updatedAt`
 
 Relaciones:

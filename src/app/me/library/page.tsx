@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { LibraryGameCard } from "@/components/games/library-game-card";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -27,6 +28,19 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
       game: true,
     },
   });
+
+  const gameIds = entries.map((entry) => entry.gameId);
+  const groupedScores =
+    gameIds.length > 0
+      ? await prisma.review.groupBy({
+          by: ["gameId"],
+          where: { gameId: { in: gameIds } },
+          _avg: { score: true },
+          _count: { id: true },
+        })
+      : [];
+  const scoreByGame = new Map(groupedScores.map((row) => [row.gameId, row._avg.score ?? null]));
+  const reviewCountByGame = new Map(groupedScores.map((row) => [row.gameId, row._count.id]));
 
   return (
     <div className="space-y-6">
@@ -57,16 +71,18 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
           No tenés juegos en esta sección.
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {entries.map((entry) => (
-            <Link
+            <LibraryGameCard
               key={entry.id}
-              href={`/games/${entry.game.slug}`}
-              className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 hover:border-cyan-300/50"
-            >
-              <p className="font-semibold text-slate-100">{entry.game.title}</p>
-              <p className="mt-1 text-xs text-slate-400">Estado: {entry.status === "PLAYED" ? "Jugado" : "Wishlist"}</p>
-            </Link>
+              game={{
+                title: entry.game.title,
+                slug: entry.game.slug,
+                coverUrl: entry.game.coverUrl,
+              }}
+              averageScore={scoreByGame.get(entry.gameId) ?? null}
+              reviewCount={reviewCountByGame.get(entry.gameId) ?? 0}
+            />
           ))}
         </div>
       )}

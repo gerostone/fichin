@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fichin | Sin conexión</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 20% 20%, #0b4a5f, transparent 40%), linear-gradient(160deg, #020617, #0f172a);
+        color: #e2e8f0;
+        font-family: "Avenir Next", "Montserrat", "Segoe UI", sans-serif;
+      }
+      .card {
+        width: min(520px, calc(100vw - 2rem));
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 16px;
+        background: rgba(2, 6, 23, 0.7);
+        padding: 24px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+      }
+      p {
+        margin: 0;
+        color: #cbd5e1;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Sin conexión</h1>
+      <p>No hay conexión a internet en este momento. Podés volver a intentar cuando recuperes señal.</p>
+    </main>
+  </body>
+</html>

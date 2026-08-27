@@ -18,6 +18,7 @@ model User {
   username     String     @unique
   passwordHash String
   avatarUrl    String?
+  bio          String?    @db.VarChar(240)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   reviews      Review[]

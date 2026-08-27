@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 const links = [
@@ -11,11 +12,13 @@ const links = [
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const mobileLinks = session?.user ? [...links, { href: "/me", label: "Mi perfil" }] : links;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-slate-950/95 p-2 backdrop-blur md:hidden">
-      <ul className="grid grid-cols-3 gap-2">
-        {links.map((link) => {
+      <ul className={`grid gap-2 ${mobileLinks.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+        {mobileLinks.map((link) => {
           const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
 
           return (

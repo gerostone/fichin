@@ -190,6 +190,36 @@ Responses:
 - `401` sin sesión
 - `404` usuario objetivo no existe
 
+## Avatar de Perfil
+
+### `PATCH /api/me/avatar`
+
+Auth requerida.
+
+Sube avatar desde dispositivo mediante `multipart/form-data`.
+
+Body:
+- `avatar`: archivo `JPEG` o `PNG`
+
+Reglas:
+- Formato obligatorio: `image/jpeg` o `image/png`
+- Dimensiones máximas: `4096px x 4096px`
+
+Responses:
+- `200`
+- `400` formato o dimensiones inválidas
+- `401` sin sesión
+
+### `DELETE /api/me/avatar`
+
+Auth requerida.
+
+Quita el avatar del usuario autenticado.
+
+Responses:
+- `200`
+- `401` sin sesión
+
 ## Errores comunes
 
 Formato general:

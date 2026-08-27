@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { UserGameStatus } from "@prisma/client";
 
 import { ProfileAvatarEditor } from "@/components/social/profile-avatar-editor";
+import { ProfileBioEditor } from "@/components/social/profile-bio-editor";
 import { buildAvatarSeed, getInitials } from "@/lib/avatar";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -117,7 +118,11 @@ export default async function MyProfilePage() {
                   Ver perfil público
                 </Link>
               </div>
-              <p className="mt-2 text-sm text-slate-300">Tu espacio personal para seguir actividad y reseñas.</p>
+              <ProfileBioEditor
+                bio={user.bio}
+                isEditable
+                emptyText="Tu espacio personal para seguir actividad y reseñas."
+              />
             </div>
           </div>
 

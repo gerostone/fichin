@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { FollowButton } from "@/components/social/follow-button";
 import { ProfileAvatarEditor } from "@/components/social/profile-avatar-editor";
+import { ProfileBioEditor } from "@/components/social/profile-bio-editor";
 import { buildAvatarSeed, getInitials } from "@/lib/avatar";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -95,7 +96,11 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
 
             <div>
               <h1 className="text-3xl font-bold">@{user.username}</h1>
-              <p className="mt-2 text-sm text-slate-300">Perfil público de reseñas de videojuegos.</p>
+              <ProfileBioEditor
+                bio={user.bio}
+                isEditable={isOwnProfile}
+                emptyText="Perfil público de reseñas de videojuegos."
+              />
             </div>
           </div>
 

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
+import { NotificationsMenu } from "@/components/layout/notifications-menu";
+
 const links = [
   { href: "/dashboard", label: "Inicio" },
   { href: "/me/library", label: "Biblioteca" },
@@ -47,6 +49,7 @@ export function TopNav() {
               <Link href="/me" className="hidden text-sm text-slate-300 hover:text-cyan-200 sm:inline">
                 @{session.user.username}
               </Link>
+              <NotificationsMenu />
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="rounded-full border border-orange-300/70 px-3 py-2 text-xs font-semibold text-orange-200 hover:bg-orange-400/10"

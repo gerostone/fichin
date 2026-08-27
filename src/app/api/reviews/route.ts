@@ -36,23 +36,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Review content is too short" }, { status: 400 });
   }
 
-  const review = await prisma.review.upsert({
-    where: {
-      userId_gameId: {
+  const review = await prisma.$transaction(async (tx) => {
+    const savedReview = await tx.review.upsert({
+      where: {
+        userId_gameId: {
+          userId: session.user.id,
+          gameId: parsed.data.gameId,
+        },
+      },
+      create: {
         userId: session.user.id,
         gameId: parsed.data.gameId,
+        score: parsed.data.score,
+        content: sanitizedContent,
       },
-    },
-    create: {
-      userId: session.user.id,
-      gameId: parsed.data.gameId,
-      score: parsed.data.score,
-      content: sanitizedContent,
-    },
-    update: {
-      score: parsed.data.score,
-      content: sanitizedContent,
-    },
+      update: {
+        score: parsed.data.score,
+        content: sanitizedContent,
+      },
+    });
+
+    await tx.userGame.upsert({
+      where: {
+        userId_gameId: {
+          userId: session.user.id,
+          gameId: parsed.data.gameId,
+        },
+      },
+      create: {
+        userId: session.user.id,
+        gameId: parsed.data.gameId,
+        status: "PLAYED",
+      },
+      update: {
+        status: "PLAYED",
+      },
+    });
+
+    return savedReview;
   });
 
   return NextResponse.json({ review });

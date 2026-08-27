@@ -14,6 +14,8 @@ Producción: [https://fichin.vercel.app](https://fichin.vercel.app)
 - Perfiles públicos de usuario (`/users/[username]`).
 - Sistema de follow entre usuarios.
 - Feed social con reseñas de usuarios seguidos (`/feed`).
+- Upload de foto de perfil desde dispositivo (JPEG/PNG, max 4096px).
+- Soporte PWA (instalable + fallback offline básico).
 - APIs protegidas y validadas con `zod`.
 - Suite de tests unitarios y E2E.
 
@@ -53,6 +55,7 @@ NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="<secret-largo-aleatorio>"
 IGDB_CLIENT_ID=""
 IGDB_CLIENT_SECRET=""
+BLOB_READ_WRITE_TOKEN=""
 ```
 
 ### 3) Crear base y sincronizar schema

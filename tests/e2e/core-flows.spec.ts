@@ -113,10 +113,20 @@ test("E2E auth guard: protected APIs return 401 without session", async ({ reque
   await expect(followResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
 
   const avatarResponse = await request.patch("/api/me/avatar", {
-    data: { avatarUrl: "https://example.com/avatar.png" },
+    multipart: {},
   });
   expect(avatarResponse.status()).toBe(401);
   await expect(avatarResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
+
+  const notificationsResponse = await request.get("/api/notifications");
+  expect(notificationsResponse.status()).toBe(401);
+  await expect(notificationsResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
+
+  const bioResponse = await request.patch("/api/me/bio", {
+    data: { bio: "Intento sin sesión" },
+  });
+  expect(bioResponse.status()).toBe(401);
+  await expect(bioResponse.json()).resolves.toMatchObject({ error: "Unauthorized" });
 });
 
 test("E2E catalog search: keyword and genre filters return results", async ({ request }) => {
@@ -206,6 +216,64 @@ test("E2E social flow: follow user, view profile, and see followed reviews in fe
   expect(feedHtml).toContain(followedUsername);
   expect(feedHtml).toContain("Review from followed user");
 
+  const followerNotificationsResponse = await followerCtx.get("/api/notifications");
+  expect(followerNotificationsResponse.status()).toBe(200);
+  const followerNotificationsBody = (await followerNotificationsResponse.json()) as {
+    notifications: Array<{ type: "FOLLOW" | "REVIEW"; actorUsername: string; message: string }>;
+  };
+  expect(
+    followerNotificationsBody.notifications.some(
+      (notification) =>
+        notification.type === "REVIEW" && notification.actorUsername === followedUsername,
+    ),
+  ).toBeTruthy();
+
+  const followedNotificationsResponse = await followedCtx.get("/api/notifications");
+  expect(followedNotificationsResponse.status()).toBe(200);
+  const followedNotificationsBody = (await followedNotificationsResponse.json()) as {
+    notifications: Array<{ type: "FOLLOW" | "REVIEW"; actorUsername: string }>;
+  };
+  expect(
+    followedNotificationsBody.notifications.some(
+      (notification) => notification.type === "FOLLOW" && notification.actorUsername === followerUsername,
+    ),
+  ).toBeTruthy();
+
   await followerCtx.dispose();
   await followedCtx.dispose();
+});
+
+test("E2E review behavior: creating a review marks game as PLAYED", async ({ request, baseURL }) => {
+  const gamesResponse = await request.get("/api/games?limit=1");
+  expect(gamesResponse.ok()).toBeTruthy();
+  const gamesBody = (await gamesResponse.json()) as GamesResponse;
+  expect(gamesBody.games.length).toBeGreaterThan(0);
+
+  const game = gamesBody.games[0];
+  const timestamp = Date.now();
+  const email = `e2e_review_played_${timestamp}@fichin.test`;
+  const username = `e2erp_${timestamp}`;
+  const password = "StrongPass1";
+
+  await registerUser(request, email, username, password);
+  await loginWithCredentials(request, baseURL ?? "http://localhost:3000", email, password);
+
+  const reviewResponse = await request.post("/api/reviews", {
+    data: {
+      gameId: game.id,
+      score: 77,
+      content: "Reseña que debe marcar el juego como jugado",
+    },
+  });
+  expect(reviewResponse.status()).toBe(200);
+
+  const playedLibraryResponse = await request.get("/api/user-games?status=PLAYED");
+  expect(playedLibraryResponse.status()).toBe(200);
+  const playedLibraryBody = (await playedLibraryResponse.json()) as {
+    entries: Array<{ gameId: string; status: string }>;
+  };
+
+  expect(
+    playedLibraryBody.entries.some((entry) => entry.gameId === game.id && entry.status === "PLAYED"),
+  ).toBeTruthy();
 });

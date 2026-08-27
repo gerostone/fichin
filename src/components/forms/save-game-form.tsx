@@ -14,6 +14,7 @@ export function SaveGameForm({ gameId, initialStatus }: SaveGameFormProps) {
   const router = useRouter();
   const { status } = useSession();
   const [saving, setSaving] = useState(false);
+  const [savingTarget, setSavingTarget] = useState<UserGameStatus | null>(null);
   const [selected, setSelected] = useState<UserGameStatus | null>(initialStatus);
 
   async function save(statusValue: UserGameStatus) {
@@ -24,6 +25,7 @@ export function SaveGameForm({ gameId, initialStatus }: SaveGameFormProps) {
 
     try {
       setSaving(true);
+      setSavingTarget(statusValue);
       const response = await fetch("/api/user-games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,6 +43,7 @@ export function SaveGameForm({ gameId, initialStatus }: SaveGameFormProps) {
       alert("No se pudo guardar el juego");
     } finally {
       setSaving(false);
+      setSavingTarget(null);
     }
   }
 
@@ -55,7 +58,11 @@ export function SaveGameForm({ gameId, initialStatus }: SaveGameFormProps) {
             : "border border-cyan-300/50 bg-cyan-500/10 text-cyan-100"
         }`}
       >
-        {saving ? "Guardando..." : "Guardar en wishlist"}
+        {saving && savingTarget === "WISHLIST"
+          ? "Guardando..."
+          : selected === "WISHLIST"
+            ? "Guardado en Wishlist"
+            : "Guardar en wishlist"}
       </button>
 
       <button
@@ -67,7 +74,11 @@ export function SaveGameForm({ gameId, initialStatus }: SaveGameFormProps) {
             : "border border-orange-300/50 bg-orange-500/10 text-orange-100"
         }`}
       >
-        {saving ? "Guardando..." : "Marcar como jugado"}
+        {saving && savingTarget === "PLAYED"
+          ? "Guardando..."
+          : selected === "PLAYED"
+            ? "Jugado"
+            : "Marcar como jugado"}
       </button>
     </div>
   );

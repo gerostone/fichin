@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { buildCanonicalGameFilter } from "@/lib/game-catalog";
 import { prisma } from "@/lib/prisma";
 import { gameQuerySchema } from "@/lib/validations";
 
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
   const { q, genre, platform, sort, page: requestedPage, limit } = parsed.data;
 
   const where = {
+    ...buildCanonicalGameFilter(),
     ...(q
       ? {
           title: {

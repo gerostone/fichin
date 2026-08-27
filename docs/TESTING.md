@@ -5,8 +5,9 @@
 ### Unit
 
 - Framework: Vitest
-- Archivo actual: `src/lib/validations.test.ts`
-- Valida score de reseñas dentro/fuera de rango.
+- Archivos:
+  - `src/lib/validations.test.ts` (score de reseñas)
+  - `src/lib/avatar-upload.test.ts` (reglas de avatar: mime, dimensiones, URL blob)
 
 Ejecutar:
 
@@ -33,6 +34,7 @@ La suite valida:
 10. Follow entre usuarios.
 11. Acceso a perfil público de otro usuario.
 12. Feed con reseñas de usuarios seguidos.
+13. Endpoint de avatar protegido retorna `401` sin sesión.
 
 Ejecutar:
 

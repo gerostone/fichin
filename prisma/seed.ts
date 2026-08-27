@@ -166,46 +166,55 @@ async function fetchIgdbGames(): Promise<IgdbGame[]> {
   // Add explicit franchise coverage for popular keywords that can be underrepresented
   // in pure top-rating/recent slices.
   const curatedSearchTerms = [
-    "EA SPORTS FC",
-    "FIFA",
-    "eFootball",
-    "PES",
-    "Football Manager",
-    "NBA 2K",
-    "Madden NFL",
-    "F1",
-    "WWE 2K",
-    "MLB The Show",
-    "NHL",
+    { term: "EA SPORTS FC", limit: 50, pages: 1 },
+    { term: "FIFA", limit: 50, pages: 1 },
+    { term: "eFootball", limit: 50, pages: 1 },
+    { term: "PES", limit: 50, pages: 1 },
+    { term: "Football Manager", limit: 50, pages: 1 },
+    { term: "NBA 2K", limit: 50, pages: 1 },
+    { term: "Madden NFL", limit: 50, pages: 1 },
+    { term: "F1", limit: 50, pages: 1 },
+    { term: "WWE 2K", limit: 50, pages: 1 },
+    { term: "MLB The Show", limit: 50, pages: 1 },
+    { term: "NHL", limit: 50, pages: 1 },
+    { term: "Fortnite", limit: 50, pages: 1 },
+    { term: "Call of Duty", limit: 100, pages: 4 },
+    { term: "BLACK", limit: 50, pages: 1 },
+    { term: "Ratatouille", limit: 50, pages: 1 },
+    { term: "The Simpsons: Hit & Run", limit: 50, pages: 1 },
+    { term: "The Simpsons Game", limit: 50, pages: 1 },
   ];
 
-  for (const term of curatedSearchTerms) {
-    const query = [
-      `search "${term}";`,
-      "fields id,name,slug,summary,rating,total_rating,total_rating_count,first_release_date,genres.name,platforms.name,cover.url;",
-      "limit 50;",
-    ].join(" ");
+  for (const entry of curatedSearchTerms) {
+    for (let page = 0; page < entry.pages; page += 1) {
+      const query = [
+        `search "${entry.term}";`,
+        "fields id,name,slug,summary,rating,total_rating,total_rating_count,first_release_date,genres.name,platforms.name,cover.url;",
+        `limit ${entry.limit};`,
+        `offset ${page * entry.limit};`,
+      ].join(" ");
 
-    const response = await fetch("https://api.igdb.com/v4/games", {
-      method: "POST",
-      headers: {
-        "Client-ID": clientId,
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-      body: query,
-    });
+      const response = await fetch("https://api.igdb.com/v4/games", {
+        method: "POST",
+        headers: {
+          "Client-ID": clientId,
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+        },
+        body: query,
+      });
 
-    if (!response.ok) {
-      throw new Error(`IGDB search request failed for term "${term}" (${response.status})`);
+      if (!response.ok) {
+        throw new Error(`IGDB search request failed for term "${entry.term}" (${response.status})`);
+      }
+
+      const data = (await response.json()) as IgdbGame[];
+      for (const game of data) {
+        byId.set(game.id, game);
+      }
+
+      await sleep(320);
     }
-
-    const data = (await response.json()) as IgdbGame[];
-    for (const game of data) {
-      byId.set(game.id, game);
-    }
-
-    await sleep(320);
   }
 
   return Array.from(byId.values());
